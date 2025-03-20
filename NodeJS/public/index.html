@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ESP8266 Camera Feed</title>
+    <style>
+        body {
+        text-align: center;
+        font-family: Arial, sans-serif;
+        margin: 20px auto;
+        background-image: url("child_collage.jpg");
+        background-size: cover;
+        max-width: 400px;
+        }
+        #camera-feed {
+        max-width: 100%;
+        border: 2px solid #000;
+        border-radius: 3px;
+        }
+        button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #eee;
+        border-radius: 3px;
+        width: 80px;
+        }
+        button:active {
+            background-color: #777;
+        }
+        hr {
+            margin-top: -10px;
+            margin-bottom: 20px;
+            width: 322px;
+            height: 1px;
+            background-color: #000;
+        }
+        main {
+            height: 90vh;
+            align-content: center;
+        }
+        #icon {
+            max-width: 100%;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Camera Feed</h1>
+        <hr>
+        <!-- Replace with your ESP8266's IP address -->
+        <img id="camera-feed" src="/esp-img" alt="Camera Feed">
+        <br>
+        <button id="refresh-btn"><img id="icon" src="camrea_icon.png" /></button>
+    </main>
+    <script>
+        const cameraFeed = document.getElementById('camera-feed');
+        const refreshBtn = document.getElementById('refresh-btn');
+
+        // Function to refresh image by updating the src with a timestamp query parameter
+        function refreshImage() {
+        cameraFeed.src = "/esp-img?" + new Date().getTime();
+        }
+
+        // Refresh image on button click
+        refreshBtn.addEventListener('click', refreshImage);
+
+        // Optionally, auto-refresh every 5 seconds
+        // setInterval(refreshImage, 5000);
+    </script>
+</body>
+</html>
