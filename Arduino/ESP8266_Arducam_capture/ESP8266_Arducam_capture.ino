@@ -9,12 +9,11 @@
 #include "Arducam_Mega.h"
 // #include "Platform.h"
 
-const char* ssid = "SSID";
-const char* password = "PASS";  // Replace with your actual WiFi password
+const char* ssid = "SSID";      // Replace with you WiFi SSID
+const char* password = "PASS";  // Replace with your WiFi password
 
+// Setting camera variables
 CAM_IMAGE_MODE imageMode = CAM_IMAGE_MODE_VGA;
-// CAM_WHITE_BALANCE whiteBalance = CAM_WHITE_BALANCE_MODE_HOME;
-// CAM_BRIGHTNESS_LEVEL brightnessLevel = CAM_BRIGHTNESS_LEVEL_3;
 ESP8266WebServer server(80);
 const int CS = 16;
 Arducam_Mega myCAM( CS );
@@ -24,6 +23,7 @@ uint8_t headFlag = 0;
 const size_t bufferSize = 2048;
 uint8_t buffer[bufferSize] = {0};
 
+// Sending the image data to the server in bytes
 void sendImageData(void)
 {
     int i = 0;
@@ -60,6 +60,7 @@ void sendImageData(void)
     }
 }
 
+// Taking picture and preparing html-webpage
 void captureCallbackFunction(void)
 {
     myCAM.takePicture(imageMode, CAM_IMAGE_PIX_FMT_JPG);
@@ -72,6 +73,7 @@ void captureCallbackFunction(void)
     sendImageData();
 }
 
+// Starting live stream and preparing html-webpage
 void streamCallbackFunction(void)
 {
     WiFiClient client = server.client();
@@ -110,12 +112,14 @@ void handleNotFound(void)
 
 void setup(){
     Serial.begin(115200);
+    // Setting up camera
     myCAM.begin();
+    // I am using a NoIR camera module, so the picture becomes purple
+    // To compensate, I add a green filter
     myCAM.setColorEffect(CAM_COLOR_FX_GRASS_GREEN);
-    // myCAM.setBrightness(brightnessLevel);
     myCAM.takePicture(CAM_IMAGE_MODE_WQXGA2, CAM_IMAGE_PIX_FMT_JPG);
     
-    // Connect to your WiFi network instead of creating a hotspot
+    // Connect to your WiFi network
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
     Serial.print("Connecting to WiFi");
@@ -128,6 +132,7 @@ void setup(){
     Serial.println(WiFi.localIP());
 
     server.on("/capture", HTTP_GET, captureCallbackFunction);
+    // The Node.js server requests the image from the endpoint /favicon.ico
     server.on("/favicon.ico", HTTP_GET, captureCallbackFunction);
     server.on("/stream", HTTP_GET, streamCallbackFunction);
     server.onNotFound(handleNotFound);
